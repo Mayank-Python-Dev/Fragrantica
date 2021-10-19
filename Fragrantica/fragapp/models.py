@@ -4,17 +4,22 @@ from django.db import models
 
 from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
-from django_mysql.models import ListCharField
+# from django_mysql.models import ListCharField
+from django.contrib.postgres.fields import ArrayField
+
 
 class Brand(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
     b_name = models.CharField(max_length=100, null=True, blank=True)
     official_link = models.URLField(max_length=500, null=True, blank=True)
     activity = models.CharField(max_length=200, null=True, blank=True)
-    about = models.TextField(null=True, blank=True)
+    about_brand = models.TextField(null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
     rating = models.CharField(max_length=200, null=True, blank=True, default = '')
-    reference = models.URLField(max_length=500, null=True, blank=True)
+    reference = models.URLField(max_length=500, null=True, blank=True) 
+    brand_understanding = models.TextField(null=True, blank=True)
+    image = models.URLField(max_length=500, null=True, blank=True)
+
 
     def __str__(self):
         return f'{self.b_name}'
@@ -27,7 +32,6 @@ class Popular_products_by_brands(models.Model):
     link = models.URLField(max_length=500, null=True, blank=True)
     sex = models.CharField(max_length=50, null=True, blank=True)
     image = models.URLField(max_length=500, null=True, blank=True)
-    year = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.b_name} -- {self.p_name}'
@@ -36,18 +40,19 @@ class Most_used_notes_by_brand(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
     b_name = models.ForeignKey(Brand, null=True, blank=True, on_delete=models.CASCADE)
     score = models.PositiveIntegerField(null=True, blank=True)
-    accord = models.PositiveIntegerField(null=True, blank=True)
+    accord = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.b_name}'
+        return f'{self.b_name} -- {self.accord,self.score}'
 
 
 class All_fragnances_by_brand(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     b_name = models.ForeignKey(Brand, null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=200, null=True, blank=True)
     link = models.URLField(max_length=500, null=True, blank=True)
     image = models.URLField(max_length=500, null=True, blank=True)
-    year = models.PositiveIntegerField(null=True, blank=True)
+    year = models.CharField(max_length=100, null=True, blank=True)
     sex = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
@@ -55,12 +60,16 @@ class All_fragnances_by_brand(models.Model):
 
 
 class Products(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     b_name = models.ForeignKey(Brand, null=True, blank=True, on_delete=models.CASCADE)
     p_name = models.CharField(max_length=200, null=True, blank=True)
     p_image = models.URLField(max_length=500, null=True, blank=True)
     sex = models.CharField(max_length=50, null=True, blank=True)
-    year = models.PositiveIntegerField(null=True, blank=True)
+    year = models.CharField(max_length=100,null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    reference = models.URLField(max_length=500, null=True, blank=True)
+    colour = models.CharField(max_length=200, null=True, blank=True)
+    time = models.CharField(max_length=200, null=True, blank=True)
 
 
     def __str__(self):
@@ -68,6 +77,7 @@ class Products(models.Model):
 
 
 class Main_accords(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     p_name = models.ForeignKey(Products, null=True, blank=True, on_delete=models.CASCADE)
     score = models.FloatField(null=True, blank=True)
     accord = models.CharField(max_length=200, null=True, blank=True)
@@ -77,6 +87,7 @@ class Main_accords(models.Model):
 
 
 class Occasion(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     p_name = models.ForeignKey(Products, null=True, blank=True, on_delete=models.CASCADE)
     sport = models.PositiveIntegerField(null=True, blank=True)
     night_out = models.PositiveIntegerField(null=True, blank=True)
@@ -90,6 +101,7 @@ class Occasion(models.Model):
 
 
 class Similar_products(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     p_name = models.ForeignKey(Products, null=True, blank=True, on_delete=models.CASCADE)
     link = models.URLField(max_length=500, null=True, blank=True)
     image = models.URLField(max_length=500, null=True, blank=True)
@@ -100,6 +112,7 @@ class Similar_products(models.Model):
 
 
 class Audience(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     p_name = models.ForeignKey(Products, null=True, blank=True, on_delete=models.CASCADE)
     young = models.PositiveIntegerField(null=True, blank=True)
     old = models.PositiveIntegerField(null=True, blank=True)
@@ -111,13 +124,14 @@ class Audience(models.Model):
 
 
 class Seasons(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     p_name = models.ForeignKey(Products, null=True, blank=True, on_delete=models.CASCADE)
-    winter = models.CharField(max_length=300, null=True, blank=True)
-    summer = models.CharField(max_length=300, null=True, blank=True)
-    spring = models.CharField(max_length=300, null=True, blank=True)
-    fall = models.CharField(max_length=300, null=True, blank=True)
-    day = models.CharField(max_length=300, null=True, blank=True)
-    night = models.CharField(max_length=300, null=True, blank=True)
+    winter = models.FloatField(null=True, blank=True)
+    summer = models.FloatField(null=True, blank=True)
+    spring = models.FloatField(null=True, blank=True)
+    fall = models.FloatField(null=True, blank=True)
+    day = models.FloatField(null=True, blank=True)
+    night = models.FloatField(null=True, blank=True)
 
 
     def __str__(self):
@@ -125,23 +139,12 @@ class Seasons(models.Model):
 
 
 class Product_notes(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     p_name = models.ForeignKey(Products, null=True, blank=True, on_delete=models.CASCADE)
-    top_note = ListCharField(
-        base_field=models.CharField(max_length=10),
-        size=6,
-        max_length=(6 * 11),)
-    middle_note = ListCharField(
-        base_field=models.CharField(max_length=10),
-        size=6,
-        max_length=(6 * 11),)
-    base_note = ListCharField(
-        base_field=models.CharField(max_length=10),
-        size=6,
-        max_length=(6 * 11),)
-    others = ListCharField(
-        base_field=models.CharField(max_length=10),
-        size=6,
-        max_length=(6 * 11),)
+    top_note = models.TextField(null=True, blank=True)
+    middle_note = models.TextField(null=True, blank=True)
+    base_note = models.TextField(null=True, blank=True)
+    others = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.p_name}'
